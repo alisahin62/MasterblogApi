@@ -48,6 +48,30 @@ def add_post():
     return jsonify(new_post), 201
 
 
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    """
+    Search for blog posts by title and/or content.
+
+    Accepts query parameters 'title' and 'content'.
+    Returns a list of posts matching the search criteria.
+    Returns an empty list if no posts match.
+    """
+    title_query = request.args.get('title', '').lower()
+    content_query = request.args.get('content', '').lower()
+
+    results = []
+    for post in POSTS:
+        title_match = title_query in post['title'].lower() if title_query else True
+        content_match = content_query in post['content'].lower() if content_query else True
+
+        if title_query or content_query:
+            if (title_query and title_match) or (content_query and content_match):
+                results.append(post)
+
+    return jsonify(results)
+
+
 @app.route('/api/posts/<int:post_id>', methods=['DELETE'])
 def delete_post(post_id):
     """
